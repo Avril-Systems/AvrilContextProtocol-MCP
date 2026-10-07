@@ -1,46 +1,45 @@
 # Avril Knowledge MCP
 
-Grounded Avril Systems company knowledge for **any MCP client**. One RAG corpus (Supabase pgvector / **RAG-DB**) over canonical docs, current state, ADRs, and source audits — exposed as MCP tools so agents stop inventing Avril.
+Contexto canónico de **Avril Systems** para cualquier cliente MCP. Un corpus RAG (Supabase pgvector / **RAG-DB**) con docs de empresa, estado actual, ADRs y auditorías — expuesto como tools MCP para que los agentes dejen de inventar Avril.
 
-**Live remote endpoint:** [`https://mcp.avril.life/mcp`](https://mcp.avril.life/mcp)  
+**Endpoint en vivo:** [`https://mcp.avril.life/mcp`](https://mcp.avril.life/mcp)  
 **Health:** [`https://mcp.avril.life/health`](https://mcp.avril.life/health)
 
 **Tools:** `search_knowledge` · `list_namespaces` · `get_current_state` · `get_decision`
 
-Pattern sibling of [MotusContextProtocol-MCP](https://github.com/Motus-DAO/MotusContextProtocol-MCP).
+Patrón hermano de [MotusContextProtocol-MCP](https://github.com/Motus-DAO/MotusContextProtocol-MCP).
+
+> Los docs fuente están en inglés; puedes preguntar en **español**. El agente debe recuperar el contexto con las tools y responderte en el idioma en que preguntaste.
 
 ---
 
-## Team: connect without deploying
+## Para el equipo (sin deploy)
 
-If the gateway is already up, you only need the URL. No clone, ingest, or Docker required.
+Solo necesitas la URL. No hace falta clonar, hacer ingest ni Docker.
 
-| Client | How |
-|--------|-----|
-| **ChatGPT** (Developer mode) | Custom app / connector → URL `https://mcp.avril.life/mcp` · Auth: **No authentication** |
-| **Claude.ai / Claude Desktop** | Settings → Connectors → custom connector → same URL |
-| **Cursor** | MCP → remote URL or `mcp-remote` (see below) |
+| Cliente | Cómo |
+|---------|------|
+| **ChatGPT** (Developer mode) | App / conector custom → URL `https://mcp.avril.life/mcp` · Auth: **No authentication** |
+| **Claude.ai / Claude Desktop** | Settings → Connectors → custom connector → misma URL |
+| **Cursor** | MCP remoto o `mcp-remote` (abajo) |
 | **Codex / OpenAI API** | Streamable HTTP MCP URL |
-| **Custom agents / bots** | `POST https://mcp.avril.life/mcp` (optional Bearer `MCP_API_KEY` if you lock auth later) |
+| **Agentes / bots propios** | `POST https://mcp.avril.life/mcp` |
 
-Auth mode in production is **`mixed`**: discovery + read-only `tools/call` work without a key (ChatGPT-friendly).
+Auth en producción: **`none`** (tools de solo lectura; compatible con ChatGPT).
 
-### ChatGPT (step by step)
+### ChatGPT (paso a paso)
 
-1. Enable **Developer mode**: ChatGPT → **Settings → Security and login → Developer mode**.
-2. Create an app: **Settings → Apps / Connectors** (or Plugins, depending on UI) → **Create**.
-3. Fill in:
+1. Activa **Developer mode**: ChatGPT → **Settings → Security and login → Developer mode**.
+2. Crea una app: **Settings → Apps / Connectors** → **Create** / **Add custom MCP**.
+3. Completa:
    - **Name:** `Avril Knowledge`
-   - **Description:** Search Avril Systems current state, product, architecture, decisions, and research docs.
+   - **Description:** Buscar estado actual, producto, arquitectura, decisiones e investigación de Avril Systems.
    - **MCP server URL:** `https://mcp.avril.life/mcp`
    - **Authentication:** **No authentication**
-4. Save. You should see tools: `search_knowledge`, `list_namespaces`, `get_current_state`, `get_decision`.
-5. In a **new chat**, enable the Avril app, then ask e.g.:
-   - *What is Avril’s current commercial product?*
-   - *Use get_current_state — what exists in production today?*
-   - *What does ADR-001 decide about the Launcher vs Company OS?*
+4. Guarda. Deberías ver: `search_knowledge`, `list_namespaces`, `get_current_state`, `get_decision`.
+5. En un **chat nuevo**, activa la app Avril y prueba con los prompts de abajo.
 
-### Cursor (remote — recommended for the team)
+### Cursor (remoto — recomendado para el equipo)
 
 ```json
 {
@@ -53,7 +52,7 @@ Auth mode in production is **`mixed`**: discovery + read-only `tools/call` work 
 }
 ```
 
-Or paste `https://mcp.avril.life/mcp` in Cursor Settings → MCP if your build supports HTTP MCP URLs directly.
+O pega `https://mcp.avril.life/mcp` en Cursor Settings → MCP si tu build acepta URL HTTP directa.
 
 ### Claude
 
@@ -61,38 +60,69 @@ Or paste `https://mcp.avril.life/mcp` in Cursor Settings → MCP if your build s
 
 ---
 
+## Prompts de smoke-test (español)
+
+Copia/pega en ChatGPT, Claude o Cursor con el MCP activo. Si la respuesta inventa sin citar tools / CURRENT-STATE, algo está mal.
+
+1. **Producto comercial actual**  
+   `Usa get_current_state. ¿Cuál es el producto comercial actual de Avril y qué se está vendiendo hoy?`
+
+2. **Qué existe vs tesis**  
+   `Usa get_current_state. Distingue claramente: qué está BUILT/CURRENT hoy, qué es prototipo (Dashboard), y qué es solo THESIS (Company OS). Responde en español.`
+
+3. **Decisión fundadora**  
+   `Usa get_decision. ¿Qué decide el ADR-001 sobre el Launcher vs el Company OS?`
+
+4. **Búsqueda dirigida**  
+   `Usa search_knowledge con namespace product. ¿Qué es Avril Lab / Agent Launcher y cuál es el flujo Avril Lab → Stripe → LaunchOpenClaw?`
+
+5. **Anti-alucinación**  
+   `Usa get_current_state. ¿Ya está demostrado en producción el loop completo pago real → provisioning → agente persistente listo → uso repetido? Si es UNKNOWN, dilo explícitamente.`
+
+### Respuesta esperada (referencia rápida)
+
+- Producto comercial actual: **Agent Launcher / Avril Lab**
+- Infra: **LaunchOpenClaw**
+- Dashboard / Company OS: **prototipo experimental**, no el foco comercial
+- Company OS / empresas agenticas: **tesis de largo plazo**
+- Loop completo de producción: aún **UNKNOWN** según el audit
+
+---
+
 ## Status
 
-| Area | Status |
+| Área | Estado |
 |------|--------|
-| Knowledge corpus | Avril docs v0.2 under `content/` |
-| RAG engine | `packages/rag-core` |
+| Corpus | Docs Avril v0.2 en `content/` |
+| RAG | `packages/rag-core` |
 | MCP stdio (local) | `packages/mcp-server` |
-| MCP HTTP (remote) | `https://mcp.avril.life/mcp` |
-| Supabase | Project **RAG-DB** |
+| MCP HTTP (remoto) | `https://mcp.avril.life/mcp` |
+| Supabase | Proyecto **RAG-DB** |
 
 ## Namespaces
 
-| Namespace | Use |
+| Namespace | Uso |
 |-----------|-----|
-| `current-state` | What exists today (`CURRENT-STATE.md`) |
-| `product` | Launcher / product evolution |
-| `architecture` | MCP, company architecture, knowledge system |
-| `canonical` | Company thesis / overview |
-| `research` | Market, open questions, backlog |
+| `current-state` | Qué existe hoy (`CURRENT-STATE.md`) |
+| `product` | Launcher / evolución de producto |
+| `architecture` | MCP, arquitectura, sistema de conocimiento |
+| `canonical` | Tesis / overview de la compañía |
+| `research` | Mercado, open questions, backlog |
 | `decisions` | ADRs |
-| `sources` | Reality audits |
-| `glossary` | Glossary |
+| `sources` | Auditorías / reality checks |
+| `glossary` | Glosario |
 
-## Retrieval rule
+## Regla de retrieval
 
-Never flatten thesis and implementation state. Prefer `get_current_state` / namespace `current-state` for “what exists now”.
+Nunca mezclar tesis e implementación como si fueran lo mismo. Para “qué existe ahora”, preferir `get_current_state` / namespace `current-state`.
 
-## Local setup (maintainers)
+---
+
+## Setup local (maintainers)
 
 ```bash
 cp .env.example .env
-# fill SUPABASE_SERVICE_ROLE_KEY + VENICE_INFERENCE_KEY
+# llenar SUPABASE_SERVICE_ROLE_KEY + VENICE_INFERENCE_KEY
 
 npm install
 npm run ingest
@@ -100,7 +130,7 @@ npm run mcp          # stdio
 npm run mcp:http     # http://localhost:3012/mcp
 ```
 
-### Cursor (stdio, local clone)
+### Cursor (stdio, clone local)
 
 ```json
 {
@@ -114,11 +144,11 @@ npm run mcp:http     # http://localhost:3012/mcp
 }
 ```
 
-## VPS deploy
+## Deploy VPS
 
 ```bash
 cd ~/MCP-Avril/deploy
-cp .env.example .env   # fill secrets — never commit this file
+cp .env.example .env   # secrets — nunca commitear este archivo
 docker compose up -d --build
 curl http://127.0.0.1:3012/health
 ```
@@ -131,4 +161,4 @@ mcp.avril.life {
 }
 ```
 
-Motus remains on `mcp.motusdao.org` → `:3011`. Avril uses `:3012`.
+Motus sigue en `mcp.motusdao.org` → `:3011`. Avril usa `:3012`.
