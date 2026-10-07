@@ -1,0 +1,19 @@
+{
+  "name": "mcp-avril",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "ingest": "npm run build -w @avril/rag-core && tsx scripts/ingest-local.ts",
+    "mcp": "tsx packages/mcp-server/src/server.ts",
+    "mcp:http": "tsx packages/mcp-http/src/server.ts",
+    "mcp:http:build": "npm run build -w @avril/rag-core && npm run build -w @avril/mcp-server && npm run build -w @avril/mcp-http"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0"
+  }
+}

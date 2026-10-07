@@ -1,0 +1,26 @@
+{
+  "name": "@avril/mcp-http",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "avril-mcp-http": "./dist/server.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@avril/mcp-server": "*",
+    "@avril/rag-core": "*",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0"
+  }
+}

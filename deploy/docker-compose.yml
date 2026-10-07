@@ -1,0 +1,23 @@
+name: avril-mcp
+
+services:
+  avril-mcp:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: avril-mcp-http
+    restart: unless-stopped
+    ports:
+      - "${MCP_PORT:-3012}:3012"
+    env_file:
+      - .env
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 3012
+      MCP_ALLOWED_HOSTS: ${MCP_ALLOWED_HOSTS:-}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "--header=Host: localhost", "http://127.0.0.1:3012/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
