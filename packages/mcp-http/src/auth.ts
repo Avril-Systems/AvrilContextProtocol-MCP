@@ -40,6 +40,12 @@ function isPublicInMixedMode(req: Request): boolean {
 
 export function createApiKeyMiddleware(apiKey: string | undefined, mode: McpAuthMode) {
   return (req: Request, res: Response, next: NextFunction) => {
+    // ChatGPT / browser connectors send CORS preflight before initialize.
+    if (req.method === 'OPTIONS') {
+      next();
+      return;
+    }
+
     if (mode === 'none' || !apiKey) {
       next();
       return;

@@ -31,6 +31,37 @@ const app = createMcpExpressApp({
 
 const transports = new Map<string, StreamableHTTPServerTransport>();
 
+/** ChatGPT custom MCP runs in the browser and requires CORS + OPTIONS. */
+app.use((req, res, next) => {
+  const origin = typeof req.headers.origin === 'string' ? req.headers.origin : '';
+  const allowOrigin =
+    !origin ||
+    origin === 'https://chatgpt.com' ||
+    origin === 'https://chat.openai.com' ||
+    origin.endsWith('.openai.com') ||
+    origin.endsWith('.chatgpt.com')
+      ? origin || '*'
+      : null;
+
+  if (allowOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', allowOrigin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'content-type, accept, authorization, x-api-key, mcp-protocol-version, mcp-session-id'
+    );
+    res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
+  }
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
+  next();
+});
+
 app.get('/health', (_req, res) => {
   res.json({
     ok: true,
