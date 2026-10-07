@@ -17,6 +17,9 @@ export function inferNamespace(relativePath: string): KnowledgeNamespace {
   if (norm.startsWith('current-state/') || base === 'CURRENT-STATE.md') return 'current-state';
   if (norm.startsWith('decisions/') || base.startsWith('ADR-')) return 'decisions';
   if (norm.startsWith('sources/')) return 'sources';
+  if (norm.startsWith('research/') || base.includes('STATE_OF_AGENTIC') || base.includes('MARKET_RESEARCH')) {
+    return 'research';
+  }
 
   if (base.startsWith('02-') || base.startsWith('03-')) return 'product';
   if (base.startsWith('07-') || base.startsWith('09-') || base.startsWith('10-')) {
